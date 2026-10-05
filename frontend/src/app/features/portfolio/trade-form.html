@@ -1,0 +1,115 @@
+<form class="form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+  @if (problem(); as message) {
+    <p class="alert" role="alert"><app-icon name="alert" /> {{ message }}</p>
+  }
+
+  <app-segmented label="Sens de l'ordre" [options]="sides" [(value)]="side" />
+
+  <div class="form__row">
+    <label class="field">
+      <span class="field__label">Compte</span>
+      <select
+        class="select"
+        formControlName="accountId"
+        [attr.aria-invalid]="!!errors()['accountId']"
+      >
+        <option value="" disabled>Choisir…</option>
+        @for (account of investmentAccounts(); track account.id) {
+          <option [value]="account.id">{{ account.name }}</option>
+        }
+      </select>
+      @if (errors()['accountId']; as error) {
+        <span class="field__error">{{ error }}</span>
+      }
+    </label>
+    <label class="field">
+      <span class="field__label">Titre</span>
+      <select class="select" formControlName="assetId" [attr.aria-invalid]="!!errors()['assetId']">
+        <option value="" disabled>Choisir…</option>
+        @for (asset of assets.value(); track asset.id) {
+          <option [value]="asset.id">{{ asset.symbol }} — {{ asset.name }}</option>
+        }
+      </select>
+      @if (errors()['assetId']; as error) {
+        <span class="field__error">{{ error }}</span>
+      }
+    </label>
+  </div>
+
+  <label class="field">
+    <span class="field__label">Date d'exécution</span>
+    <input
+      class="input"
+      type="date"
+      formControlName="tradedOn"
+      [max]="today"
+      [attr.aria-invalid]="!!errors()['tradedOn']"
+    />
+    @if (errors()['tradedOn']; as error) {
+      <span class="field__error">{{ error }}</span>
+    }
+  </label>
+
+  <div class="form__row">
+    <label class="field">
+      <span class="field__label">Quantité</span>
+      <input
+        class="input num"
+        type="number"
+        min="0"
+        step="any"
+        formControlName="quantity"
+        [attr.aria-invalid]="!!errors()['quantity']"
+      />
+      @if (errors()['quantity']; as error) {
+        <span class="field__error">{{ error }}</span>
+      }
+    </label>
+    <label class="field">
+      <span class="field__label">Cours (€)</span>
+      <input
+        class="input num"
+        type="number"
+        min="0"
+        step="any"
+        formControlName="price"
+        [attr.aria-invalid]="!!errors()['price']"
+      />
+      <span class="field__hint">Clôture du jour proposée</span>
+      @if (errors()['price']; as error) {
+        <span class="field__error">{{ error }}</span>
+      }
+    </label>
+  </div>
+
+  <label class="field">
+    <span class="field__label">Frais (€)</span>
+    <input
+      class="input num"
+      type="number"
+      min="0"
+      step="0.01"
+      formControlName="fees"
+      [attr.aria-invalid]="!!errors()['fees']"
+    />
+    @if (errors()['fees']; as error) {
+      <span class="field__error">{{ error }}</span>
+    }
+  </label>
+
+  @if (total(); as amount) {
+    <p class="trade-total">
+      <span class="muted">{{ side() === 'BUY' ? 'Montant débité' : 'Montant crédité' }}</span>
+      <strong class="num">{{ amount }}</strong>
+    </p>
+  }
+
+  <div class="form__actions">
+    <div class="form__actions-end">
+      <button type="button" class="btn btn--ghost" (click)="cancelled.emit()">Annuler</button>
+      <button type="submit" class="btn btn--primary" [disabled]="saving()">
+        {{ side() === 'BUY' ? "Enregistrer l'achat" : 'Enregistrer la vente' }}
+      </button>
+    </div>
+  </div>
+</form>

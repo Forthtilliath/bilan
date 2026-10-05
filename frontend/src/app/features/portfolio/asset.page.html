@@ -1,0 +1,92 @@
+<div class="page">
+  <a class="card__link" routerLink="/investissements">← Investissements</a>
+
+  @if (asset.error()) {
+    <p class="alert" role="alert">Ce titre est introuvable.</p>
+  }
+
+  @if (asset.hasValue()) {
+    @let a = asset.value();
+    <header class="page-header">
+      <div class="page-header__text">
+        <p class="eyebrow">{{ labels[a.assetClass] }} · {{ a.symbol }}</p>
+        <h1 class="page-title">{{ a.name }}</h1>
+      </div>
+      <div class="page-header__actions">
+        <button type="button" class="btn btn--primary" (click)="trading.set(true)">
+          <app-icon name="plus" [size]="16" /> Passer un ordre
+        </button>
+      </div>
+    </header>
+
+    <div class="grid grid--tiles">
+      <app-stat-tile label="Dernier cours" [value]="formatPrice(a.price)">
+        @if (a.change1d !== null) {
+          <app-delta [value]="a.change1d" unit="pct" [suffix]="'le ' + formatDate(a.priceDate)" />
+        }
+      </app-stat-tile>
+      <app-stat-tile label="Sur un an" [value]="formatPct(a.change1y, true)">
+        <span>Variation du cours</span>
+      </app-stat-tile>
+      @if (holding(); as h) {
+        <app-stat-tile label="Ma position" [value]="formatEur(h.marketValue)">
+          <span>{{ formatQuantity(h.quantity) }} × PRU {{ formatPrice(h.averageCost) }}</span>
+        </app-stat-tile>
+        <app-stat-tile
+          label="Plus-value latente"
+          [value]="formatEur(h.unrealizedGain, { signed: true })"
+        >
+          <app-delta [value]="h.unrealizedPct ?? 0" unit="pct" suffix="sur le prix de revient" />
+        </app-stat-tile>
+      } @else {
+        <app-stat-tile label="Ma position" value="—">
+          <span>Aucune part détenue</span>
+        </app-stat-tile>
+      }
+    </div>
+
+    <app-chart-card
+      heading="Cours"
+      [subtitle]="'Variation sur la période : ' + formatPct(periodChange(), true)"
+    >
+      <app-segmented actions label="Période" [options]="ranges" [(value)]="range" />
+      @if (dates().length > 1) {
+        <app-line-chart
+          [dates]="dates()"
+          [series]="series()"
+          [height]="280"
+          [label]="'Cours de ' + a.name"
+          [format]="formatPrice"
+          [axisFormat]="formatPrice"
+        />
+      }
+      <table table class="table">
+        <thead>
+          <tr>
+            <th scope="col">Date</th>
+            <th scope="col" class="num">Clôture</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (point of visible().slice().reverse(); track point.date) {
+            <tr>
+              <td>{{ formatDate(point.date) }}</td>
+              <td class="num">{{ formatPrice(point.value) }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </app-chart-card>
+
+    <section class="card">
+      <header class="card__header">
+        <h2 class="card__title">Mes ordres sur {{ a.symbol }}</h2>
+      </header>
+      <app-trades-table [trades]="trades.value()" (remove)="deleteTrade($event)" />
+    </section>
+  }
+</div>
+
+<app-drawer heading="Passer un ordre" [open]="trading()" (closed)="trading.set(false)">
+  <app-trade-form [defaultAssetId]="id()" (done)="refresh()" (cancelled)="trading.set(false)" />
+</app-drawer>
