@@ -7,7 +7,7 @@ COPY src ./src
 RUN mvn -B -q package -DskipTests
 
 # --- Runtime : JRE seul, utilisateur non root
-FROM eclipse-temurin:21-jre-alpine
+FROM eclipse-temurin:25-jre-alpine
 WORKDIR /app
 RUN addgroup -S bilan && adduser -S bilan -G bilan
 COPY --from=build /app/target/*.jar app.jar
