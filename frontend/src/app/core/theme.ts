@@ -39,7 +39,11 @@ export class ThemeService {
     if (preference !== 'system') {
       return preference === 'dark';
     }
-    return this.document.defaultView?.matchMedia('(prefers-color-scheme: dark)').matches ?? false;
+    // matchMedia peut manquer (vieux navigateurs, environnements de test) : theme clair par defaut.
+    const view = this.document.defaultView;
+    return typeof view?.matchMedia === 'function'
+      ? view.matchMedia('(prefers-color-scheme: dark)').matches
+      : false;
   }
 }
 
