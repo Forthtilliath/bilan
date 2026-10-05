@@ -1,0 +1,107 @@
+<form class="form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+  @if (problem(); as message) {
+    <p class="alert" role="alert"><app-icon name="alert" /> {{ message }}</p>
+  }
+
+  <label class="field">
+    <span class="field__label">Nom du compte</span>
+    <input
+      class="input"
+      formControlName="name"
+      maxlength="80"
+      [attr.aria-invalid]="!!errors()['name']"
+      autocomplete="off"
+    />
+    @if (errors()['name']; as error) {
+      <span class="field__error">{{ error }}</span>
+    }
+  </label>
+
+  <div class="form__row">
+    <label class="field">
+      <span class="field__label">Type</span>
+      <select class="select" formControlName="type" [attr.aria-invalid]="!!errors()['type']">
+        @for (type of types; track type) {
+          <option [value]="type">{{ typeLabels[type] }}</option>
+        }
+      </select>
+      @if (errors()['type']; as error) {
+        <span class="field__error">{{ error }}</span>
+      }
+    </label>
+    <label class="field">
+      <span class="field__label">Établissement</span>
+      <input class="input" formControlName="institution" maxlength="80" placeholder="Facultatif" />
+    </label>
+  </div>
+
+  <div class="form__row">
+    <label class="field">
+      <span class="field__label">Solde à l'ouverture (€)</span>
+      <input
+        class="input num"
+        type="number"
+        step="0.01"
+        formControlName="openingBalance"
+        [attr.aria-invalid]="!!errors()['openingBalance']"
+      />
+      @if (errors()['openingBalance']; as error) {
+        <span class="field__error">{{ error }}</span>
+      }
+    </label>
+    <label class="field">
+      <span class="field__label">Ouvert le</span>
+      <input
+        class="input"
+        type="date"
+        formControlName="openedOn"
+        [max]="today"
+        [attr.aria-invalid]="!!errors()['openedOn']"
+      />
+      @if (errors()['openedOn']; as error) {
+        <span class="field__error">{{ error }}</span>
+      }
+    </label>
+  </div>
+
+  <div class="field">
+    <span class="field__label" id="account-color">Couleur</span>
+    <div class="picker" role="radiogroup" aria-labelledby="account-color">
+      @for (slot of slots; track slot) {
+        <button
+          type="button"
+          class="picker__option"
+          role="radio"
+          [attr.aria-checked]="form.controls.color.value === slot"
+          [attr.aria-label]="'Couleur ' + slot"
+          (click)="form.controls.color.setValue(slot)"
+        >
+          <span class="picker__swatch" [style.--swatch]="seriesColor(slot)"></span>
+        </button>
+      }
+    </div>
+  </div>
+
+  @if (account()) {
+    <label class="checkbox">
+      <input type="checkbox" formControlName="archived" />
+      Archivé (compte clôturé, conservé dans l'historique)
+    </label>
+  }
+
+  <div class="form__actions">
+    @if (account(); as existing) {
+      <app-confirm-button
+        [disabled]="saving()"
+        [confirmLabel]="'Supprimer avec ses ' + existing.transactionCount + ' opérations'"
+        (confirmed)="remove()"
+      />
+    }
+    <div class="form__actions-end">
+      <button type="button" class="btn btn--ghost" (click)="cancelled.emit()">Annuler</button>
+      <button type="submit" class="btn btn--primary" [disabled]="saving()">
+        {{ account() ? 'Enregistrer' : 'Créer le compte' }}
+      </button>
+    </div>
+  </div>
+</form>
