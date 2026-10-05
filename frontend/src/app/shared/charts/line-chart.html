@@ -5,7 +5,7 @@
     [attr.width]="g.width"
     [attr.height]="height()"
     [attr.viewBox]="'0 0 ' + g.width + ' ' + height()"
-    role="img"
+    role="group"
     [attr.aria-label]="label()"
   >
     <g class="chart__grid">
@@ -75,7 +75,12 @@
       [attr.width]="g.right - g.left"
       [attr.height]="g.bottom - g.top"
       tabindex="0"
-      [attr.aria-label]="'Parcourir ' + label() + ' avec les flèches'"
+      role="slider"
+      [attr.aria-label]="label() + ' : parcourir les dates avec les flèches'"
+      aria-valuemin="0"
+      [attr.aria-valuemax]="dates().length - 1"
+      [attr.aria-valuenow]="hover() ?? dates().length - 1"
+      [attr.aria-valuetext]="valueText()"
       (pointermove)="onPointerMove($event)"
       (pointerleave)="hover.set(null)"
       (focus)="onFocus()"

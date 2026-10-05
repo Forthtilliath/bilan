@@ -21,7 +21,7 @@ import { Icon } from '../icon';
     }
     <span>{{ text() }}</span>
     @if (suffix()) {
-      <span class="delta__suffix">{{ suffix() }}</span>
+      <span class="delta__suffix"> {{ suffix() }}</span>
     }
   `,
 })

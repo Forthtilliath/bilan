@@ -5,7 +5,7 @@
     [attr.width]="g.width"
     [attr.height]="height()"
     [attr.viewBox]="'0 0 ' + g.width + ' ' + height()"
-    role="img"
+    role="group"
     [attr.aria-label]="label()"
   >
     @for (group of g.groups; track group.key) {

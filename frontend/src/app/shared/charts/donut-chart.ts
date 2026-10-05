@@ -22,7 +22,7 @@ export interface DonutSlice {
       [attr.width]="size()"
       [attr.height]="size()"
       [attr.viewBox]="'0 0 ' + size() + ' ' + size()"
-      role="img"
+      role="group"
       [attr.aria-label]="label()"
     >
       @for (arc of arcs(); track arc.key) {
@@ -32,7 +32,8 @@ export interface DonutSlice {
           [attr.d]="arc.d"
           [style.fill]="arc.color"
           tabindex="0"
-          [attr.aria-label]="arc.label + ' : ' + arc.valueLabel"
+          role="img"
+          [attr.aria-label]="arc.label + ' : ' + arc.valueLabel + ', ' + arc.share"
           (pointerenter)="hover.set(arc.key)"
           (pointerleave)="hover.set(null)"
           (focus)="hover.set(arc.key)"
