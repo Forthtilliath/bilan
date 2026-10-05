@@ -23,6 +23,8 @@ public record TransactionFilter(
 		LocalDate to,
 		String q) {
 
+	static final int MAX_QUERY_LENGTH = 140;
+
 	public enum Kind {
 		INCOME,
 		EXPENSE,
@@ -42,17 +44,12 @@ public record TransactionFilter(
 				predicates.add(cb.isNull(root.get("transferId")));
 			}
 			if (kind != null) {
-				switch (kind) {
-					case TRANSFER -> predicates.add(cb.isNotNull(root.get("transferId")));
-					case INCOME -> {
-						predicates.add(cb.isNull(root.get("transferId")));
-						predicates.add(cb.gt(root.get("amount"), 0));
-					}
-					case EXPENSE -> {
-						predicates.add(cb.isNull(root.get("transferId")));
-						predicates.add(cb.lt(root.get("amount"), 0));
-					}
-				}
+				// Expression switch : le compilateur verifie que chaque type est traite.
+				predicates.add(switch (kind) {
+					case TRANSFER -> cb.isNotNull(root.get("transferId"));
+					case INCOME -> cb.and(cb.isNull(root.get("transferId")), cb.gt(root.get("amount"), 0));
+					case EXPENSE -> cb.and(cb.isNull(root.get("transferId")), cb.lt(root.get("amount"), 0));
+				});
 			}
 			if (from != null) {
 				predicates.add(cb.greaterThanOrEqualTo(root.get("bookedOn"), from));
@@ -61,7 +58,10 @@ public record TransactionFilter(
 				predicates.add(cb.lessThanOrEqualTo(root.get("bookedOn"), to));
 			}
 			if (q != null && !q.isBlank()) {
-				String pattern = "%" + q.strip().toLowerCase(Locale.ROOT).replace("%", "\\%").replace("_", "\\_") + "%";
+				String text = q.strip();
+				// Recherche bornee : un libelle fait 140 caracteres au plus, inutile de comparer davantage.
+				text = text.substring(0, Math.min(text.length(), MAX_QUERY_LENGTH));
+				String pattern = "%" + text.toLowerCase(Locale.ROOT).replace("%", "\\%").replace("_", "\\_") + "%";
 				predicates.add(cb.or(
 						cb.like(cb.lower(root.get("label")), pattern, '\\'),
 						cb.like(cb.lower(cb.coalesce(root.get("note"), "")), pattern, '\\')));
