@@ -1,0 +1,15 @@
+{
+  "name": "bilan",
+  "private": true,
+  "description": "Bilan — lance la base, le backend Spring Boot et le frontend Angular en parallele",
+  "scripts": {
+    "demo": "docker compose up --build",
+    "db": "docker compose up -d db",
+    "dev": "npm run db && concurrently -n backend,frontend -c blue,green \"npm:dev:backend\" \"npm:dev:frontend\"",
+    "dev:backend": "node scripts/backend.mjs",
+    "dev:frontend": "npm --prefix frontend start"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.4"
+  }
+}
