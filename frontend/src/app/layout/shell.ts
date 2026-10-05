@@ -1,5 +1,7 @@
-import { Component, inject, signal } from '@angular/core';
-import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { Component, ElementRef, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { filter } from 'rxjs';
 
 import { BilanApi, toProblem } from '../core/api';
 import { ThemeService } from '../core/theme';
@@ -75,6 +77,34 @@ interface NavItem {
 })
 export class Shell {
   private readonly api = inject(BilanApi);
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
+
+  constructor() {
+    // Mobile : la navigation defile horizontalement ; on y ramene l'onglet actif apres chaque navigation.
+    inject(Router)
+      .events.pipe(
+        filter((event) => event instanceof NavigationEnd),
+        takeUntilDestroyed(),
+      )
+      .subscribe(() => {
+        requestAnimationFrame(() => {
+          this.revealActiveLink();
+        });
+      });
+  }
+
+  /** Centre l'onglet actif dans la barre de navigation quand elle deborde, sans faire defiler la page. */
+  private revealActiveLink(): void {
+    const nav = this.host.nativeElement.querySelector<HTMLElement>('.nav');
+    const active = nav?.querySelector<HTMLElement>('.nav__link.is-active');
+    if (!nav || !active || nav.scrollWidth <= nav.clientWidth) {
+      return;
+    }
+    const navBox = nav.getBoundingClientRect();
+    const linkBox = active.getBoundingClientRect();
+    const left = nav.scrollLeft + linkBox.left - navBox.left - (navBox.width - linkBox.width) / 2;
+    nav.scrollTo({ left: Math.max(0, left), behavior: 'instant' });
+  }
   protected readonly theme = inject(ThemeService);
 
   protected readonly nav: readonly NavItem[] = [
