@@ -1,8 +1,8 @@
 /* Bilan — design system : jetons, socle, mise en page, composants, formulaires, graphiques. */
-@import './styles/tokens.css';
-@import './styles/base.css';
-@import './styles/layout.css';
-@import './styles/components.css';
-@import './styles/widgets.css';
-@import './styles/forms.css';
-@import './styles/charts.css';
+@import url('./styles/tokens.css');
+@import url('./styles/base.css');
+@import url('./styles/layout.css');
+@import url('./styles/components.css');
+@import url('./styles/widgets.css');
+@import url('./styles/forms.css');
+@import url('./styles/charts.css');
