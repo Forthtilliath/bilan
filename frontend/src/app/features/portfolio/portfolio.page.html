@@ -1,0 +1,91 @@
+<div class="page">
+  <header class="page-header">
+    <div class="page-header__text">
+      <p class="eyebrow">Bourse et crypto</p>
+      <h1 class="page-title">Investissements</h1>
+    </div>
+    <div class="page-header__actions">
+      <button type="button" class="btn btn--primary" (click)="trading.set(true)">
+        <app-icon name="plus" [size]="16" /> Passer un ordre
+      </button>
+    </div>
+  </header>
+
+  <div class="filters">
+    <app-segmented
+      label="Comptes"
+      [options]="scopes()"
+      [value]="scope()"
+      (valueChange)="setScope($event)"
+    />
+  </div>
+
+  @if (failed() && !data()) {
+    <p class="alert" role="alert">
+      Impossible de charger le portefeuille.
+      <button type="button" class="btn btn--sm" (click)="refresh()">Réessayer</button>
+    </p>
+  }
+
+  @if (data(); as p) {
+    <div class="stack" [class.is-loading]="loading()">
+      @if (tiles(); as t) {
+        <div class="grid grid--tiles">
+          <app-stat-tile label="Valeur totale" [value]="t.value">
+            <app-delta [value]="t.dayChange" suffix="aujourd'hui" />
+          </app-stat-tile>
+          <app-stat-tile label="Plus-value latente" [value]="t.unrealized">
+            <app-delta [value]="t.unrealizedPct" unit="pct" suffix="sur le prix de revient" />
+          </app-stat-tile>
+          <app-stat-tile label="Plus-values réalisées" [value]="t.realized">
+            <span>Ventes passées, frais déduits</span>
+          </app-stat-tile>
+          <app-stat-tile label="Gain total" [value]="t.performance">
+            <span>{{ formatPct(t.performancePct, true) }} sur {{ t.contributed }} versés</span>
+          </app-stat-tile>
+        </div>
+      }
+
+      <div class="grid grid--main-side">
+        <app-performance-card [portfolio]="p" />
+        <app-allocation-card [portfolio]="p" />
+      </div>
+
+      <section class="card">
+        <header class="card__header">
+          <div class="card__heading">
+            <h2 class="card__title">Positions</h2>
+            <p class="card__subtitle">
+              PRU frais d'achat inclus · liquidités disponibles : {{ tiles()?.cash }}
+            </p>
+          </div>
+        </header>
+        <app-holdings-table [holdings]="p.holdings" />
+      </section>
+
+      <section class="card">
+        <header class="card__header">
+          <h2 class="card__title">Historique des ordres</h2>
+        </header>
+        @if (tradeError(); as message) {
+          <p class="alert" role="alert"><app-icon name="alert" /> {{ message }}</p>
+        }
+        <app-trades-table
+          [trades]="trades.value()"
+          [showAccount]="!scope()"
+          (remove)="deleteTrade($event)"
+        />
+      </section>
+    </div>
+  } @else if (!failed()) {
+    <p class="empty">Chargement du portefeuille…</p>
+  }
+</div>
+
+<app-drawer heading="Passer un ordre" [open]="trading()" (closed)="trading.set(false)">
+  <app-trade-form
+    [defaultAccountId]="scope() || null"
+    (done)="refresh()"
+    (cancelled)="trading.set(false)"
+  />
+</app-drawer>
