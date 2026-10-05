@@ -79,8 +79,10 @@ export class TradeForm {
     initialValue: this.form.getRawValue(),
   });
 
+  /** Titre choisi : un `computed` ne se propage que s'il change (pas a chaque frappe dans le formulaire). */
+  private readonly assetId = computed(() => this.value().assetId ?? '');
   private readonly prices = httpResource<SeriesPoint[]>(
-    () => (this.value().assetId ? `/api/assets/${this.value().assetId}/prices` : undefined),
+    () => (this.assetId() ? `/api/assets/${this.assetId()}/prices` : undefined),
     { defaultValue: [] },
   );
 
