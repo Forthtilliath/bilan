@@ -27,4 +27,19 @@ test.describe('mobile', () => {
       'page',
     );
   });
+
+  test('l’onglet actif reste visible dans la barre qui défile', async ({ page }) => {
+    for (const path of ['/investissements', '/categories', '/transactions']) {
+      await page.goto(path);
+      const active = page.locator('.nav__link.is-active');
+      await expect(active).toBeVisible();
+      await expect
+        .poll(async () => {
+          const box = await active.boundingBox();
+          const width = page.viewportSize()?.width ?? 0;
+          return !!box && box.x >= 0 && box.x + box.width <= width;
+        })
+        .toBe(true);
+    }
+  });
 });
