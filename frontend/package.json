@@ -7,8 +7,13 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test --watch=false",
+    "test:coverage": "ng test --watch=false --coverage",
     "lint": "eslint . --max-warnings 0",
-    "format": "prettier --write \"src/**/*.{ts,html,css}\""
+    "lint:css": "stylelint \"src/**/*.css\"",
+    "typecheck": "tsc -p tsconfig.app.json --noEmit && tsc -p tsconfig.spec.json --noEmit",
+    "format:check": "prettier --check \"src/**/*.{ts,html,css}\"",
+    "format": "prettier --write \"src/**/*.{ts,html,css}\"",
+    "audit": "npm audit --audit-level=high"
   },
   "private": true,
   "packageManager": "npm@11.17.0",
@@ -28,11 +33,14 @@
     "@angular/build": "^22.2.0",
     "@angular/cli": "^22.2.0",
     "@angular/compiler-cli": "^22.2.0",
-    "@forthtilliath/eslint-config": "^0.7.0",
+    "@forthtilliath/eslint-config": "^0.8.0",
     "@forthtilliath/typescript-config": "^0.1.1",
+    "@vitest/coverage-v8": "^5.0.3",
     "eslint": "^9.39.5",
     "jsdom": "^30.0.0",
     "prettier": "^3.8.1",
+    "stylelint": "^17.16.0",
+    "stylelint-config-standard": "^40.0.0",
     "typescript": "~6.0.2",
     "vitest": "^5.0.0"
   }
