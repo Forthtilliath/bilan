@@ -136,7 +136,8 @@ public class PortfolioService {
 		BigDecimal flowSum = BigDecimal.ZERO;
 		for (Snapshot snapshot : ledger.timeline().sample(SampleDates.weekly(start, ledger.today()))) {
 			while (cursor < flows.size() && !flows.get(cursor).bookedOn().isAfter(snapshot.date())) {
-				flowSum = flowSum.add(flows.get(cursor++).amount());
+				flowSum = flowSum.add(flows.get(cursor).amount());
+				cursor++;
 			}
 			BigDecimal opening = accounts.stream().filter(a -> !snapshot.date().isBefore(a.getOpenedOn()))
 					.map(Account::getOpeningBalance).reduce(BigDecimal.ZERO, BigDecimal::add);

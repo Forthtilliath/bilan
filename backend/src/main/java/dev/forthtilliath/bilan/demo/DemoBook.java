@@ -122,7 +122,8 @@ final class DemoBook {
 	private Transaction add(AccountKey account, LocalDate date, BigDecimal amount, String label) {
 		Transaction tx = new Transaction(accounts.get(account).getId(), date, amount, label);
 		// Heure de saisie croissante : tri stable des operations d'un meme jour.
-		tx.setCreatedAt(date.atTime(8, 0).toInstant(ZoneOffset.UTC).plusSeconds(sequence++));
+		tx.setCreatedAt(date.atTime(8, 0).toInstant(ZoneOffset.UTC).plusSeconds(sequence));
+		sequence++;
 		transactions.add(tx);
 		return tx;
 	}

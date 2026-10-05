@@ -112,7 +112,7 @@ public class TradeService {
 			Position.replay(events);
 		} catch (OversellException ex) {
 			throw FieldErrorsException.of(field, "Position insuffisante : " + ex.getHeld().stripTrailingZeros()
-					.toPlainString() + " " + asset.getSymbol() + " détenu(s) le " + FR_DATE.format(ex.getDate()) + ".");
+					.toPlainString() + " " + asset.getSymbol() + " détenu(s) le " + FR_DATE.format(ex.getDate()) + ".", ex);
 		}
 	}
 

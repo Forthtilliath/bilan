@@ -11,6 +11,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.YearMonth;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,7 +34,7 @@ final class InvestingPlan {
 			new BigDecimal("1.10"));
 
 	private final DemoBook book;
-	private final Map<AccountKey, BigDecimal> cash = new HashMap<>();
+	private final Map<AccountKey, BigDecimal> cash = new EnumMap<>(AccountKey.class);
 	private final Map<String, BigDecimal> peaQuantities = new HashMap<>();
 
 	InvestingPlan(DemoBook book, BigDecimal peaOpening, BigDecimal cryptoOpening) {
@@ -76,7 +77,7 @@ final class InvestingPlan {
 		return switch (index % 4) {
 			case 0, 1 -> "MNDE";
 			case 2 -> index % 8 == 2 ? "EURO" : "EMRG";
-			default -> SATELLITES.get((index / 4) % SATELLITES.size());
+			default -> SATELLITES.get(index / 4 % SATELLITES.size());
 		};
 	}
 

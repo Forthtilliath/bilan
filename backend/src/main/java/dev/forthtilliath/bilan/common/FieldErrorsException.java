@@ -10,6 +10,8 @@ import java.util.Map;
  */
 public class FieldErrorsException extends RuntimeException {
 
+	private static final long serialVersionUID = 1L;
+
 	private final transient Map<String, String> errors;
 
 	public FieldErrorsException(String message, Map<String, String> errors) {
@@ -19,6 +21,13 @@ public class FieldErrorsException extends RuntimeException {
 
 	public static FieldErrorsException of(String field, String message) {
 		return new FieldErrorsException(message, Map.of(field, message));
+	}
+
+	/** Meme rejet, en conservant l'exception technique d'origine. */
+	public static FieldErrorsException of(String field, String message, Throwable cause) {
+		FieldErrorsException exception = of(field, message);
+		exception.initCause(cause);
+		return exception;
 	}
 
 	public Map<String, String> getErrors() {
