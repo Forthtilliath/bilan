@@ -1,0 +1,123 @@
+<div class="page">
+  <a class="card__link" routerLink="/comptes">← Tous les comptes</a>
+
+  @if (account.error()) {
+    <p class="alert" role="alert">Ce compte est introuvable.</p>
+  }
+
+  @if (account.hasValue()) {
+    @let a = account.value();
+    <header class="page-header">
+      <div class="page-header__text">
+        <p class="eyebrow">
+          {{ typeLabels[a.type] }}{{ a.institution ? ' · ' + a.institution : '' }}
+        </p>
+        <h1 class="page-title">{{ a.name }}</h1>
+      </div>
+      <div class="page-header__actions">
+        @if (holdsAssets(a.type)) {
+          <a class="btn" routerLink="/investissements" [queryParams]="{ accountId: a.id }">
+            <app-icon name="trending" [size]="16" /> Positions
+          </a>
+        }
+        <button type="button" class="btn" (click)="editing.set(true)">
+          <app-icon name="pencil" [size]="16" /> Modifier
+        </button>
+        <button type="button" class="btn btn--primary" (click)="creatingTransaction.set(true)">
+          <app-icon name="plus" [size]="16" /> Opération
+        </button>
+      </div>
+    </header>
+
+    <div class="grid grid--tiles">
+      <app-stat-tile label="Solde" [value]="formatEur(a.balance)">
+        <app-delta [value]="a.change30d" suffix="sur 30 jours" />
+      </app-stat-tile>
+      @if (holdsAssets(a.type)) {
+        <app-stat-tile label="Titres" [value]="formatEur(a.holdingsValue)">
+          <span>Valorisés au dernier cours</span>
+        </app-stat-tile>
+        <app-stat-tile label="Liquidités" [value]="formatEur(a.cash)">
+          <span>Disponibles pour investir</span>
+        </app-stat-tile>
+      } @else {
+        <app-stat-tile label="Solde d'ouverture" [value]="formatEur(a.openingBalance)">
+          <span>Le {{ formatDate(a.openedOn) }}</span>
+        </app-stat-tile>
+        <app-stat-tile label="Opérations" [value]="'' + a.transactionCount">
+          <span>Depuis l'ouverture</span>
+        </app-stat-tile>
+      }
+    </div>
+
+    <app-chart-card heading="Évolution du solde" subtitle="Hebdomadaire, depuis l'ouverture">
+      @if (dates().length > 1) {
+        <app-line-chart
+          [dates]="dates()"
+          [series]="series()"
+          [height]="240"
+          [label]="'Solde de ' + a.name"
+        />
+      } @else {
+        <p class="empty">Pas encore d'historique.</p>
+      }
+      <table table class="table">
+        <thead>
+          <tr>
+            <th scope="col">Semaine du</th>
+            <th scope="col" class="num">Solde</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (point of history.value().slice().reverse(); track point.date) {
+            <tr>
+              <td>{{ formatDate(point.date) }}</td>
+              <td class="num">{{ formatEur(point.value) }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </app-chart-card>
+
+    <section class="card">
+      <header class="card__header">
+        <div class="card__heading">
+          <h2 class="card__title">Opérations</h2>
+          <p class="card__subtitle">Les 50 plus récentes</p>
+        </div>
+        <a class="card__link" routerLink="/transactions" [queryParams]="{ accountId: a.id }"
+          >Rechercher dans ce compte</a
+        >
+      </header>
+      @if (transactions.hasValue()) {
+        <app-transaction-table
+          [items]="transactions.value().items"
+          [showAccount]="false"
+          (selected)="editedTransaction.set($event)"
+        />
+      }
+    </section>
+
+    <app-drawer heading="Modifier le compte" [open]="editing()" (closed)="editing.set(false)">
+      <app-account-form
+        [account]="a"
+        (saved)="onSaved()"
+        (deleted)="onDeleted()"
+        (cancelled)="editing.set(false)"
+      />
+    </app-drawer>
+  }
+
+  <app-drawer
+    [heading]="editedTransaction() ? 'Modifier l’opération' : 'Nouvelle opération'"
+    [open]="!!editedTransaction() || creatingTransaction()"
+    (closed)="editedTransaction.set(null); creatingTransaction.set(false)"
+  >
+    <app-transaction-editor
+      [transaction]="editedTransaction()"
+      [defaultAccountId]="id()"
+      (done)="onTransactionDone()"
+      (cancelled)="editedTransaction.set(null); creatingTransaction.set(false)"
+    />
+  </app-drawer>
+</div>
