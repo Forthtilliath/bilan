@@ -1,0 +1,28 @@
+/* Base partagee : @forthtilliath/typescript-config (strict, noUncheckedIndexedAccess, options Angular strictes). */
+{
+  "extends": "@forthtilliath/typescript-config/angular.json",
+  "compileOnSave": false,
+  "compilerOptions": {
+    "declaration": false,
+    "declarationMap": false,
+    "skipLibCheck": true,
+    "target": "ES2022",
+    "module": "preserve",
+    "moduleResolution": "bundler"
+  },
+  "angularCompilerOptions": {
+    "enableI18nLegacyMessageIdFormat": false,
+    "strictInjectionParameters": true,
+    "strictInputAccessModifiers": true,
+    "strictTemplates": true
+  },
+  "files": [],
+  "references": [
+    {
+      "path": "./tsconfig.app.json"
+    },
+    {
+      "path": "./tsconfig.spec.json"
+    }
+  ]
+}
