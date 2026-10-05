@@ -1,0 +1,109 @@
+<div class="page">
+  <header class="page-header">
+    <div class="page-header__text">
+      <p class="eyebrow">Historique</p>
+      <h1 class="page-title">Opérations</h1>
+    </div>
+    <div class="page-header__actions">
+      <button
+        type="button"
+        class="btn"
+        [disabled]="exporting() || !summary()?.count"
+        (click)="exportCsv()"
+      >
+        <app-icon name="download" [size]="16" /> Exporter en CSV
+      </button>
+      <button type="button" class="btn btn--primary" (click)="creating.set(true)">
+        <app-icon name="plus" [size]="16" /> Nouvelle opération
+      </button>
+    </div>
+  </header>
+
+  <app-transaction-filters
+    [value]="filters()"
+    [accounts]="accounts.value()"
+    [categories]="categories.value()"
+    (changed)="applyFilters($event)"
+    (cleared)="resetFilters()"
+  />
+
+  @if (exportError(); as message) {
+    <p class="alert" role="alert">{{ message }}</p>
+  }
+  @if (result.error()) {
+    <p class="alert" role="alert">
+      Impossible de charger les opérations.
+      <button type="button" class="btn btn--sm" (click)="result.reload()">Réessayer</button>
+    </p>
+  }
+
+  <section class="card" [class.is-loading]="result.isLoading()">
+    @if (summary(); as s) {
+      <dl class="totals">
+        <div>
+          <dt>Opérations</dt>
+          <dd class="num">{{ s.count }}</dd>
+        </div>
+        <div>
+          <dt>Entrées</dt>
+          <dd class="num up">+{{ s.inflow }}</dd>
+        </div>
+        <div>
+          <dt>Sorties</dt>
+          <dd class="num">−{{ s.outflow }}</dd>
+        </div>
+        <div>
+          <dt>Solde de la sélection</dt>
+          <dd class="num">{{ s.net }}</dd>
+        </div>
+      </dl>
+    }
+
+    @if (data(); as d) {
+      <app-transaction-table
+        [items]="d.items"
+        emptyLabel="Aucune opération ne correspond à ces filtres."
+        (selected)="editing.set($event)"
+      />
+    }
+
+    @if (summary(); as s) {
+      @if (s.pages > 1) {
+        <nav class="pager" aria-label="Pagination">
+          <span>Page {{ s.page }} sur {{ s.pages }}</span>
+          <span class="filters">
+            <button
+              type="button"
+              class="btn btn--sm"
+              [disabled]="s.page <= 1"
+              (click)="goToPage(s.page - 2)"
+            >
+              <app-icon name="chevron-left" [size]="14" /> Précédente
+            </button>
+            <button
+              type="button"
+              class="btn btn--sm"
+              [disabled]="s.page >= s.pages"
+              (click)="goToPage(s.page)"
+            >
+              Suivante <app-icon name="chevron-right" [size]="14" />
+            </button>
+          </span>
+        </nav>
+      }
+    }
+  </section>
+</div>
+
+<app-drawer
+  [heading]="editing() ? 'Modifier l’opération' : 'Nouvelle opération'"
+  [open]="!!editing() || creating()"
+  (closed)="editing.set(null); creating.set(false)"
+>
+  <app-transaction-editor
+    [transaction]="editing()"
+    [defaultAccountId]="accountId() ?? null"
+    (done)="onEdited()"
+    (cancelled)="editing.set(null); creating.set(false)"
+  />
+</app-drawer>
