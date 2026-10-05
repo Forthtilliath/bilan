@@ -1,0 +1,73 @@
+<div class="page">
+  <header class="page-header">
+    <div class="page-header__text">
+      <p class="eyebrow">Vue d'ensemble</p>
+      <h1 class="page-title">Tableau de bord</h1>
+    </div>
+    <div class="page-header__actions">
+      <a class="btn" routerLink="/transactions">Toutes les opérations</a>
+    </div>
+  </header>
+
+  @if (failed() && !data()) {
+    <p class="alert" role="alert">
+      Impossible de charger le tableau de bord — le backend Spring Boot tourne-t-il sur :8082 ?
+      <button type="button" class="btn btn--sm" (click)="retry()">Réessayer</button>
+    </p>
+  }
+
+  @if (data(); as d) {
+    <div class="grid grid--main-side">
+      <app-net-worth-card [dashboard]="d" />
+      <app-accounts-summary [accounts]="accounts.value()" />
+    </div>
+
+    <section class="month-section" aria-label="Mois analysé">
+      <h2>Le mois en détail</h2>
+      <div class="filters">
+        <app-month-picker [(month)]="month" [min]="minMonth()" [max]="maxMonth" />
+      </div>
+    </section>
+
+    <div class="stack" [class.is-loading]="loading()">
+      @if (tiles(); as t) {
+        <div class="grid grid--tiles">
+          <app-stat-tile label="Revenus" [value]="t.income">
+            <app-delta [value]="t.incomeDelta" suffix="vs mois précédent" />
+          </app-stat-tile>
+          <app-stat-tile label="Dépenses" [value]="t.expense">
+            <app-delta [value]="t.expenseDelta" [upIsGood]="false" suffix="vs mois précédent" />
+          </app-stat-tile>
+          <app-stat-tile label="Épargne nette" [value]="t.net">
+            <app-delta [value]="t.netDelta" suffix="vs mois précédent" />
+          </app-stat-tile>
+          <app-stat-tile label="Taux d'épargne" [value]="t.rate">
+            <span>Part des revenus non dépensée</span>
+          </app-stat-tile>
+        </div>
+      }
+
+      <div class="grid grid--main-side">
+        <app-cashflow-card [flows]="d.cashflow" [selected]="d.month" (pick)="month.set($event)" />
+        <app-spending-card [spending]="d.spending" [month]="d.month" />
+      </div>
+
+      <div class="grid grid--main-side">
+        <app-budgets-card [spending]="d.spending" />
+        <section class="card">
+          <header class="card__header">
+            <h2 class="card__title">Dernières opérations</h2>
+            <a class="card__link" routerLink="/transactions">Tout voir</a>
+          </header>
+          <ul class="recent">
+            @for (tx of d.recent; track tx.id) {
+              <li><app-transaction-row [transaction]="tx" /></li>
+            }
+          </ul>
+        </section>
+      </div>
+    </div>
+  } @else if (!failed()) {
+    <p class="empty">Chargement du tableau de bord…</p>
+  }
+</div>
