@@ -1,0 +1,30 @@
+# Fichiers Markdown : ignores par defaut, sauf README et CHANGELOG
+*.md
+!README.md
+!CHANGELOG.md
+
+# --- Node (racine + frontend) ---
+node_modules/
+
+# --- Frontend (Angular) ---
+frontend/dist/
+frontend/.angular/
+frontend/coverage/
+
+# --- Backend (Java / Maven) ---
+backend/target/
+backend/.mvn/wrapper/maven-wrapper.jar
+
+# --- IDE ---
+.idea/
+*.iml
+.settings/
+.classpath
+.project
+
+# --- OS ---
+.DS_Store
+Thumbs.db
+
+# --- Divers ---
+*.log
