@@ -8,6 +8,7 @@
   gap: 8px;
   min-width: 0;
 }
+
 .category-chip__icon {
   display: inline-grid;
   flex: none;
@@ -18,6 +19,7 @@
   background: color-mix(in oklab, var(--chip-color) 16%, transparent);
   color: color-mix(in oklab, var(--chip-color) 70%, var(--ink));
 }
+
 .category-chip__name {
   overflow: hidden;
   text-overflow: ellipsis;
@@ -46,6 +48,7 @@
   border-radius: 10px;
   background: var(--surface-3);
 }
+
 .segmented__option {
   padding: 5px 12px;
   border: 0;
@@ -55,6 +58,7 @@
   font-size: 0.8125rem;
   font-weight: 500;
 }
+
 .segmented__option[aria-checked='true'] {
   background: var(--surface);
   color: var(--ink);
@@ -70,6 +74,7 @@
   border-radius: 10px;
   background: var(--surface);
 }
+
 .month-picker__label {
   min-width: 9.5em;
   font-weight: 600;
@@ -84,24 +89,29 @@
   flex-direction: column;
   gap: 6px;
 }
+
 .meter__track {
   height: 8px;
   overflow: hidden;
   border-radius: 999px;
   background: color-mix(in oklab, var(--meter-color, var(--ink-3)) 14%, var(--surface-3));
 }
+
 .meter__fill {
   height: 100%;
   border-radius: 999px;
   background: var(--meter-color);
   transition: width 400ms var(--ease);
 }
+
 .meter[data-status='warning'] .meter__fill {
   background: var(--warning);
 }
+
 .meter[data-status='over'] .meter__fill {
   background: var(--critical);
 }
+
 .meter__caption {
   display: flex;
   justify-content: space-between;
@@ -109,6 +119,7 @@
   color: var(--ink-3);
   font-size: 0.75rem;
 }
+
 .meter__status {
   display: inline-flex;
   align-items: center;
@@ -116,6 +127,7 @@
   color: var(--ink);
   font-weight: 500;
 }
+
 .meter__numbers {
   font-variant-numeric: tabular-nums;
 }
@@ -134,24 +146,29 @@
   color: var(--ink);
   box-shadow: var(--shadow-lg);
 }
+
 .drawer::backdrop {
   background: rgb(11 11 11 / 0.4);
   backdrop-filter: blur(2px);
 }
+
 .drawer[open] {
   animation: drawer-in 220ms var(--ease);
 }
+
 @keyframes drawer-in {
   from {
     transform: translateX(24px);
     opacity: 0;
   }
 }
+
 .drawer__panel {
   display: flex;
   flex-direction: column;
   height: 100%;
 }
+
 .drawer__header {
   display: flex;
   align-items: center;
@@ -159,10 +176,12 @@
   padding: 18px 20px;
   border-bottom: 1px solid var(--border);
 }
+
 .drawer__title {
   font-size: 1.125rem;
   font-weight: 600;
 }
+
 .drawer__body {
   flex: 1;
   overflow-y: auto;
@@ -204,10 +223,12 @@
   padding-bottom: 14px;
   border-bottom: 1px solid var(--border);
 }
+
 .totals dt {
   color: var(--ink-3);
   font-size: 0.75rem;
 }
+
 .totals dd {
   font-size: 1.125rem;
   font-weight: 600;
