@@ -7,9 +7,17 @@
     "db": "docker compose up -d db",
     "dev": "npm run db && concurrently -n backend,frontend -c blue,green \"npm:dev:backend\" \"npm:dev:frontend\"",
     "dev:backend": "node scripts/backend.mjs",
-    "dev:frontend": "npm --prefix frontend start"
+    "dev:frontend": "npm --prefix frontend start",
+    "verify": "node scripts/verify.mjs",
+    "verify:quick": "node scripts/verify.mjs --quick",
+    "test:e2e": "playwright test",
+    "audit": "node scripts/audit.mjs"
   },
   "devDependencies": {
-    "concurrently": "^9.2.4"
+    "@axe-core/playwright": "^4.13.0",
+    "@playwright/test": "^1.63.0",
+    "@types/node": "^24.19.1",
+    "concurrently": "^9.2.4",
+    "typescript": "~6.0.2"
   }
 }
