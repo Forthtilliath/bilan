@@ -1,10 +1,9 @@
 package dev.forthtilliath.bilan.demo;
 
-import java.sql.Date;
-import java.sql.Timestamp;
 import java.time.Clock;
-import java.time.Instant;
 import java.time.LocalDate;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,7 +75,7 @@ public class DemoDataSeeder implements ApplicationRunner {
 	private void write(DemoData data) {
 		jdbc.execute("delete from trades; delete from transactions; delete from asset_prices; delete from assets;"
 				+ " delete from categories; delete from accounts");
-		Timestamp now = Timestamp.from(Instant.now(clock));
+		OffsetDateTime now = OffsetDateTime.now(clock);
 
 		jdbc.batchUpdate("insert into accounts (id, name, type, institution, opening_balance, opened_on, color,"
 				+ " archived, created_at) values (?, ?, ?, ?, ?, ?, ?, false, ?)", data.accounts(), 50, (ps, a) -> {
@@ -85,10 +84,10 @@ public class DemoDataSeeder implements ApplicationRunner {
 					ps.setString(3, a.getType().name());
 					ps.setString(4, a.getInstitution());
 					ps.setBigDecimal(5, a.getOpeningBalance());
-					ps.setDate(6, Date.valueOf(a.getOpenedOn()));
+					ps.setObject(6, a.getOpenedOn());
 					ps.setInt(7, a.getColor());
 					// Ordre d'affichage = ordre du catalogue.
-					ps.setTimestamp(8, new Timestamp(now.getTime() + data.accounts().indexOf(a)));
+					ps.setObject(8, now.plusNanos(1_000_000L * data.accounts().indexOf(a)));
 				});
 		jdbc.batchUpdate("insert into categories (id, name, kind, color, icon, monthly_budget)"
 				+ " values (?, ?, ?, ?, ?, ?)", data.categories(), 50, (ps, c) -> {
@@ -109,7 +108,7 @@ public class DemoDataSeeder implements ApplicationRunner {
 		jdbc.batchUpdate("insert into asset_prices (asset_id, priced_on, close) values (?, ?, ?)", data.prices(), 1000,
 				(ps, p) -> {
 					ps.setObject(1, p.assetId());
-					ps.setDate(2, Date.valueOf(p.date()));
+					ps.setObject(2, p.date());
 					ps.setBigDecimal(3, p.close());
 				});
 		jdbc.batchUpdate("insert into transactions (id, account_id, category_id, booked_on, amount, label, note,"
@@ -117,12 +116,12 @@ public class DemoDataSeeder implements ApplicationRunner {
 					ps.setObject(1, t.getId());
 					ps.setObject(2, t.getAccountId());
 					ps.setObject(3, t.getCategoryId());
-					ps.setDate(4, Date.valueOf(t.getBookedOn()));
+					ps.setObject(4, t.getBookedOn());
 					ps.setBigDecimal(5, t.getAmount());
 					ps.setString(6, t.getLabel());
 					ps.setString(7, t.getNote());
 					ps.setObject(8, t.getTransferId());
-					ps.setTimestamp(9, Timestamp.from(t.getCreatedAt()));
+					ps.setObject(9, t.getCreatedAt().atOffset(ZoneOffset.UTC));
 				});
 		jdbc.batchUpdate("insert into trades (id, account_id, asset_id, side, traded_on, quantity, price, fees,"
 				+ " created_at) values (?, ?, ?, ?, ?, ?, ?, ?, ?)", data.trades(), 500, (ps, t) -> {
@@ -130,12 +129,12 @@ public class DemoDataSeeder implements ApplicationRunner {
 					ps.setObject(2, t.getAccountId());
 					ps.setObject(3, t.getAssetId());
 					ps.setString(4, t.getSide().name());
-					ps.setDate(5, Date.valueOf(t.getTradedOn()));
+					ps.setObject(5, t.getTradedOn());
 					ps.setBigDecimal(6, t.getQuantity());
 					ps.setBigDecimal(7, t.getPrice());
 					ps.setBigDecimal(8, t.getFees());
 					// Ordre de saisie = ordre de generation, meme pour deux ordres du meme jour.
-					ps.setTimestamp(9, Timestamp.valueOf(t.getTradedOn().atTime(9, 0).plusSeconds(data.trades().indexOf(t))));
+					ps.setObject(9, t.getTradedOn().atTime(9, 0).plusSeconds(data.trades().indexOf(t)).atOffset(ZoneOffset.UTC));
 				});
 	}
 }

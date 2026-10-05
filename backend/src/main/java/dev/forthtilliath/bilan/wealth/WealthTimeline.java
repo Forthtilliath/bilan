@@ -81,11 +81,13 @@ public final class WealthTimeline {
 
 		for (LocalDate date : dates.stream().sorted().toList()) {
 			while (cashCursor < cash.size() && !cash.get(cashCursor).date().isAfter(date)) {
-				CashMovement move = cash.get(cashCursor++);
+				CashMovement move = cash.get(cashCursor);
+				cashCursor++;
 				cashByAccount.merge(move.accountId(), move.amount(), BigDecimal::add);
 			}
 			while (holdingCursor < holdings.size() && !holdings.get(holdingCursor).date().isAfter(date)) {
-				HoldingMovement move = holdings.get(holdingCursor++);
+				HoldingMovement move = holdings.get(holdingCursor);
+				holdingCursor++;
 				quantities.computeIfAbsent(move.accountId(), id -> new HashMap<>())
 						.merge(move.assetId(), move.quantity(), BigDecimal::add);
 			}

@@ -6,6 +6,8 @@ import java.time.LocalDate;
 /** Vente d'une quantite superieure a celle detenue a cette date. */
 public class OversellException extends RuntimeException {
 
+	private static final long serialVersionUID = 1L;
+
 	private final LocalDate date;
 	private final BigDecimal held;
 

@@ -33,7 +33,7 @@ public class DashboardController {
 		try {
 			return YearMonth.parse(month);
 		} catch (DateTimeParseException ex) {
-			throw FieldErrorsException.of("month", "Mois attendu au format AAAA-MM.");
+			throw FieldErrorsException.of("month", "Mois attendu au format AAAA-MM.", ex);
 		}
 	}
 }
