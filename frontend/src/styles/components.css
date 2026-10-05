@@ -1,0 +1,214 @@
+/* Pieces d'interface reutilisees : boutons, cartes, tuiles, montants, pastilles, jauges, tiroir. */
+
+/* ---------------------------------------------------------------- Boutons */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 38px;
+  padding: 0 14px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  font-size: 0.875rem;
+  font-weight: 500;
+  white-space: nowrap;
+  transition:
+    background-color 120ms,
+    border-color 120ms,
+    transform 80ms;
+}
+.btn:hover:not(:disabled) {
+  background: var(--surface-2);
+}
+.btn:active:not(:disabled) {
+  transform: translateY(1px);
+}
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.btn--primary {
+  border-color: var(--ink);
+  background: var(--ink);
+  color: var(--on-ink);
+}
+.btn--primary:hover:not(:disabled) {
+  background: color-mix(in oklab, var(--ink) 85%, var(--page));
+}
+.btn--ghost {
+  border-color: transparent;
+  background: transparent;
+}
+.btn--danger-ghost {
+  border-color: transparent;
+  background: transparent;
+  color: var(--down);
+}
+.btn--danger,
+.btn--danger:hover:not(:disabled) {
+  border-color: var(--critical);
+  background: var(--critical);
+  color: #fff;
+}
+.btn--sm {
+  min-height: 32px;
+  padding: 0 10px;
+  font-size: 0.8125rem;
+}
+.btn--block {
+  justify-content: flex-start;
+  width: 100%;
+}
+
+.icon-button {
+  display: inline-grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--ink-2);
+  transition:
+    background-color 120ms,
+    color 120ms;
+}
+.icon-button:hover:not(:disabled) {
+  background: var(--surface-2);
+  color: var(--ink);
+}
+.icon-button:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+.icon-button[aria-pressed='true'] {
+  background: var(--surface-3);
+  color: var(--ink);
+}
+
+/* ---------------------------------------------------------------- Cartes */
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+  padding: 20px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+.card__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+.card__heading {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.card__title {
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+}
+.card__subtitle {
+  color: var(--ink-3);
+  font-size: 0.8125rem;
+}
+.card__actions {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 4px;
+}
+.card__link {
+  color: var(--ink-2);
+  font-size: 0.8125rem;
+  font-weight: 500;
+}
+.card__link:hover {
+  color: var(--ink);
+  text-decoration: underline;
+}
+
+/* ---------------------------------------------------------------- Tuiles de chiffres */
+
+.stat-tile {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 16px 18px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+.stat-tile__label {
+  color: var(--ink-2);
+  font-size: 0.8125rem;
+}
+.stat-tile__value {
+  font-size: 1.5rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+.stat-tile__meta {
+  min-height: 20px;
+  color: var(--ink-3);
+  font-size: 0.8125rem;
+}
+
+/* Chiffre vedette : un seul par vue, meme police que le reste */
+.hero-figure {
+  font-size: clamp(2.5rem, 5vw, 3.5rem);
+  font-weight: 600;
+  line-height: 1.05;
+  letter-spacing: -0.035em;
+}
+
+/* ---------------------------------------------------------------- Montants et variations */
+
+.amount {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.amount--up {
+  color: var(--up);
+}
+.amount--down {
+  color: var(--ink);
+}
+
+.delta {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  color: var(--ink-2);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.delta--good {
+  color: var(--up);
+}
+.delta--bad {
+  color: var(--down);
+}
+.delta__suffix {
+  margin-left: 3px;
+  color: var(--ink-3);
+  font-weight: 400;
+}
+.icon-button--danger,
+.icon-button--danger:hover:not(:disabled) {
+  background: var(--critical);
+  color: #fff;
+}
