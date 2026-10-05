@@ -105,7 +105,9 @@ public class CategoryService {
 		category.setKind(request.kind());
 		category.setColor(request.color());
 		category.setIcon(request.icon() == null || request.icon().isBlank() ? null : request.icon().strip());
-		category.setMonthlyBudget(request.kind() == CategoryKind.EXPENSE ? request.monthlyBudget() : null);
+		category.setMonthlyBudget(request.kind() == CategoryKind.EXPENSE && request.monthlyBudget() != null
+				? Money.cents(request.monthlyBudget())
+				: null);
 	}
 
 	private static FieldErrorsException duplicate() {

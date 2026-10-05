@@ -20,6 +20,7 @@ import dev.forthtilliath.bilan.category.Category;
 import dev.forthtilliath.bilan.category.CategoryKind;
 import dev.forthtilliath.bilan.category.CategoryRepository;
 import dev.forthtilliath.bilan.common.FieldErrorsException;
+import dev.forthtilliath.bilan.common.Money;
 import dev.forthtilliath.bilan.common.NotFoundException;
 import dev.forthtilliath.bilan.transaction.dto.TransactionPage;
 import dev.forthtilliath.bilan.transaction.dto.TransactionRequest;
@@ -135,7 +136,7 @@ public class TransactionService {
 		tx.setAccountId(request.accountId());
 		tx.setCategoryId(request.categoryId());
 		tx.setBookedOn(request.bookedOn());
-		tx.setAmount(request.amount());
+		tx.setAmount(Money.cents(request.amount()));
 		tx.setLabel(request.label().strip());
 		tx.setNote(blankToNull(request.note()));
 	}
@@ -151,10 +152,10 @@ public class TransactionService {
 		String label = blankToNull(request.label());
 		String note = blankToNull(request.note());
 		debit.setAccountId(from.getId());
-		debit.setAmount(request.amount().negate());
+		debit.setAmount(Money.cents(request.amount()).negate());
 		debit.setLabel(label != null ? label : "Virement vers " + to.getName());
 		credit.setAccountId(to.getId());
-		credit.setAmount(request.amount());
+		credit.setAmount(Money.cents(request.amount()));
 		credit.setLabel(label != null ? label : "Virement depuis " + from.getName());
 		for (Transaction leg : List.of(debit, credit)) {
 			leg.setBookedOn(request.bookedOn());

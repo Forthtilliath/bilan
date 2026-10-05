@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import dev.forthtilliath.bilan.account.dto.AccountRequest;
 import dev.forthtilliath.bilan.account.dto.AccountView;
 import dev.forthtilliath.bilan.common.FieldErrorsException;
+import dev.forthtilliath.bilan.common.Money;
 import dev.forthtilliath.bilan.common.NotFoundException;
 import dev.forthtilliath.bilan.investment.TradeRepository;
 import dev.forthtilliath.bilan.transaction.TransactionRepository;
@@ -112,10 +113,10 @@ public class AccountService {
 		account.setType(request.type());
 		account.setInstitution(request.institution() == null || request.institution().isBlank() ? null
 				: request.institution().strip());
-		account.setOpeningBalance(request.openingBalance());
+		account.setOpeningBalance(Money.cents(request.openingBalance()));
 		account.setOpenedOn(request.openedOn());
 		account.setColor(request.color());
-		account.setArchived(request.archived());
+		account.setArchived(Boolean.TRUE.equals(request.archived()));
 	}
 
 	private static AccountView view(Account account, List<Snapshot> trend, Snapshot monthAgo,
