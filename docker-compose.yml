@@ -1,0 +1,48 @@
+# Demo complete : `docker compose up --build` puis http://localhost:8089
+# Dev local     : `docker compose up -d db` puis `npm run dev` (voir README).
+services:
+  db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: bilan
+      POSTGRES_USER: bilan
+      POSTGRES_PASSWORD: bilan
+    ports:
+      # 5436 sur l'hote : 5432/5433 sont pris par des PostgreSQL natifs, 5434/5435 par d'autres projets.
+      - "5436:5432"
+    volumes:
+      - bilan-db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U bilan -d bilan"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build: ./backend
+    restart: unless-stopped
+    environment:
+      DB_URL: jdbc:postgresql://db:5432/bilan
+      DB_USER: bilan
+      DB_PASSWORD: bilan
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8082/actuator/health | grep -q UP"]
+      interval: 5s
+      timeout: 5s
+      retries: 24
+
+  frontend:
+    build: ./frontend
+    restart: unless-stopped
+    ports:
+      - "8089:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+
+volumes:
+  bilan-db:
