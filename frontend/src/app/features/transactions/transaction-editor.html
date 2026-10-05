@@ -1,0 +1,141 @@
+<form class="form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+  @if (problem(); as message) {
+    <p class="alert" role="alert"><app-icon name="alert" /> {{ message }}</p>
+  }
+
+  @if (modes().length > 1) {
+    <app-segmented
+      label="Type d'opération"
+      [options]="modes()"
+      [value]="mode()"
+      (valueChange)="switchMode($event)"
+    />
+  }
+
+  <label class="field">
+    <span class="field__label">Montant (€)</span>
+    <input
+      class="input input--amount"
+      type="number"
+      inputmode="decimal"
+      step="0.01"
+      min="0.01"
+      formControlName="amount"
+      placeholder="0,00"
+      [attr.aria-invalid]="!!errors()['amount']"
+    />
+    @if (errors()['amount']; as error) {
+      <span class="field__error">{{ error }}</span>
+    }
+  </label>
+
+  <div class="form__row">
+    <label class="field">
+      <span class="field__label">{{ mode() === 'transfer' ? 'Depuis le compte' : 'Compte' }}</span>
+      <select
+        class="select"
+        formControlName="accountId"
+        [attr.aria-invalid]="!!(errors()['accountId'] ?? errors()['fromAccountId'])"
+      >
+        <option value="" disabled>Choisir…</option>
+        @for (account of activeAccounts(); track account.id) {
+          <option [value]="account.id">{{ account.name }}</option>
+        }
+      </select>
+      @if (errors()['accountId'] ?? errors()['fromAccountId']; as error) {
+        <span class="field__error">{{ error }}</span>
+      }
+    </label>
+
+    @if (mode() === 'transfer') {
+      <label class="field">
+        <span class="field__label">Vers le compte</span>
+        <select
+          class="select"
+          formControlName="toAccountId"
+          [attr.aria-invalid]="!!errors()['toAccountId']"
+        >
+          <option value="" disabled>Choisir…</option>
+          @for (account of activeAccounts(); track account.id) {
+            <option [value]="account.id">{{ account.name }}</option>
+          }
+        </select>
+        @if (errors()['toAccountId']; as error) {
+          <span class="field__error">{{ error }}</span>
+        }
+      </label>
+    } @else {
+      <label class="field">
+        <span class="field__label">Catégorie</span>
+        <select
+          class="select"
+          formControlName="categoryId"
+          [attr.aria-invalid]="!!errors()['categoryId']"
+        >
+          <option value="">Non catégorisé</option>
+          @for (category of modeCategories(); track category.id) {
+            <option [value]="category.id">{{ category.name }}</option>
+          }
+        </select>
+        @if (errors()['categoryId']; as error) {
+          <span class="field__error">{{ error }}</span>
+        }
+      </label>
+    }
+  </div>
+
+  <div class="form__row">
+    <label class="field">
+      <span class="field__label">Libellé</span>
+      <input
+        class="input"
+        formControlName="label"
+        maxlength="140"
+        autocomplete="off"
+        [placeholder]="mode() === 'transfer' ? 'Facultatif' : 'Ex. Boulangerie du Coin'"
+        [attr.aria-invalid]="!!errors()['label']"
+      />
+      @if (errors()['label']; as error) {
+        <span class="field__error">{{ error }}</span>
+      }
+    </label>
+    <label class="field">
+      <span class="field__label">Date</span>
+      <input
+        class="input"
+        type="date"
+        formControlName="bookedOn"
+        [attr.aria-invalid]="!!errors()['bookedOn']"
+      />
+      @if (errors()['bookedOn']; as error) {
+        <span class="field__error">{{ error }}</span>
+      }
+    </label>
+  </div>
+
+  <label class="field">
+    <span class="field__label">Note</span>
+    <textarea
+      class="textarea"
+      formControlName="note"
+      maxlength="500"
+      placeholder="Facultatif"
+    ></textarea>
+  </label>
+
+  <div class="form__actions">
+    @if (transaction(); as tx) {
+      <app-confirm-button
+        [disabled]="saving()"
+        [confirmLabel]="tx.transferId ? 'Supprimer le virement' : 'Confirmer la suppression'"
+        (confirmed)="remove()"
+      />
+    }
+    <div class="form__actions-end">
+      <button type="button" class="btn btn--ghost" (click)="cancelled.emit()">Annuler</button>
+      <button type="submit" class="btn btn--primary" [disabled]="saving()">
+        {{ transaction() ? 'Enregistrer' : 'Ajouter' }}
+      </button>
+    </div>
+  </div>
+</form>
