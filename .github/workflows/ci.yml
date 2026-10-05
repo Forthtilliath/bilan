@@ -5,9 +5,16 @@ on:
     branches: [main]
   pull_request:
 
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   backend:
-    name: Backend (Spring Boot)
+    name: Backend (compilation stricte, PMD, tests, couverture)
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -20,10 +27,18 @@ jobs:
           java-version: '21'
           cache: maven
       - run: chmod +x mvnw
+      # Testcontainers utilise le Docker du runner pour les tests d'API.
       - run: ./mvnw -B verify
+      - name: Rapport de couverture
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-coverage
+          path: backend/target/site/jacoco
+          if-no-files-found: ignore
 
   frontend:
-    name: Frontend (Angular)
+    name: Frontend (format, lint, types, tests, build)
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -36,14 +51,76 @@ jobs:
           cache: npm
           cache-dependency-path: frontend/package-lock.json
       - run: npm ci
-      - run: npx prettier --check "src/**/*.{ts,html,css}"
+      - run: npm run format:check
       - run: npm run lint
-      - run: npm test
+      - run: npm run lint:css
+      - run: npm run typecheck
+      - run: npm run test:coverage
       - run: npm run build
+      - name: Rapport de couverture
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-coverage
+          path: frontend/coverage
+          if-no-files-found: ignore
 
-  docker:
-    name: Images Docker
+  security:
+    name: Sécurité (audit npm, secrets, Trivy)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-      - run: docker compose build
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '24'
+      - run: npm ci && npm --prefix frontend ci
+      - run: node scripts/audit.mjs
+      - name: Secrets dans l'historique (Gitleaks)
+        run: docker run --rm -v "$PWD:/repo" zricethezav/gitleaks:latest git /repo --no-banner --redact
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+      # Trivy lit les POM depuis le cache local : pas de rafale de requetes vers Maven Central.
+      - run: cd backend && chmod +x mvnw && ./mvnw -B -q dependency:resolve
+      - name: Dépendances, secrets et Dockerfiles (Trivy)
+        run: >-
+          docker run --rm -v "$PWD:/repo" -v "$HOME/.m2:/root/.m2:ro" aquasec/trivy:latest
+          fs --quiet --offline-scan --scanners vuln,secret,misconfig --severity HIGH,CRITICAL --exit-code 1
+          --skip-dirs node_modules --skip-dirs frontend/node_modules /repo
+
+  e2e:
+    name: E2E (pile Docker, Playwright, axe, images)
+    runs-on: ubuntu-latest
+    needs: [backend, frontend]
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: npx tsc -p e2e/tsconfig.json
+      - run: docker compose up -d --build --wait
+      - name: Images Docker (Trivy)
+        run: |
+          for image in bilan-backend bilan-frontend; do
+            docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy:latest \
+              image --quiet --scanners vuln --severity HIGH,CRITICAL --ignore-unfixed --exit-code 1 "$image"
+          done
+      - run: npx playwright install --with-deps chromium
+      - run: npx playwright test
+        env:
+          CI: true
+      - name: Rapport Playwright
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report
+      - name: Journaux de la pile
+        if: failure()
+        run: docker compose logs --no-color
