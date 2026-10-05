@@ -1,0 +1,7 @@
+# Fins de ligne LF partout (Prettier, scripts shell), y compris sur un poste Windows.
+* text=auto eol=lf
+*.cmd text eol=crlf
+*.webp binary
+*.jpg binary
+*.png binary
+*.jar binary
