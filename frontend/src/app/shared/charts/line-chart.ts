@@ -109,6 +109,14 @@ export class LineChart {
     };
   });
 
+  /** Lecture vocale du point courant (slider ARIA) : la date, puis chaque serie. */
+  protected readonly valueText = computed(() => {
+    const index = this.hover() ?? this.dates().length - 1;
+    const date = this.dateFormat()(this.dates()[index] ?? '');
+    const values = this.series().map((s) => `${s.label} ${this.format()(s.values[index] ?? 0)}`);
+    return [date, ...values].join(', ');
+  });
+
   protected onPointerMove(event: PointerEvent): void {
     const svg = (event.currentTarget as SVGElement).ownerSVGElement;
     const rect = svg?.getBoundingClientRect();
