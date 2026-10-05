@@ -1,0 +1,104 @@
+@let g = geometry();
+<div class="chart__frame" [style.height.px]="height()">
+  <svg
+    class="chart__svg"
+    [attr.width]="g.width"
+    [attr.height]="height()"
+    [attr.viewBox]="'0 0 ' + g.width + ' ' + height()"
+    role="img"
+    [attr.aria-label]="label()"
+  >
+    <g class="chart__grid">
+      @for (tick of g.yTicks; track tick.value) {
+        <line [attr.x1]="g.left" [attr.x2]="g.right" [attr.y1]="tick.y" [attr.y2]="tick.y" />
+        <text
+          class="chart__axis"
+          [attr.x]="g.left - 10"
+          [attr.y]="tick.y"
+          dy="0.32em"
+          text-anchor="end"
+        >
+          {{ tick.label }}
+        </text>
+      }
+    </g>
+    @for (tick of g.xTicks; track tick.index) {
+      <text
+        class="chart__axis"
+        [attr.x]="tick.x"
+        [attr.y]="height() - 8"
+        [attr.text-anchor]="tick.anchor"
+      >
+        {{ tick.label }}
+      </text>
+    }
+
+    @for (path of g.paths; track path.key) {
+      @if (path.area) {
+        <path class="chart__area" [attr.d]="path.area" [style.fill]="path.color" />
+      }
+      <path class="chart__line" [attr.d]="path.line" [style.stroke]="path.color" />
+    }
+    @if (tooltip(); as tip) {
+      <line
+        class="chart__crosshair"
+        [attr.x1]="tip.x"
+        [attr.x2]="tip.x"
+        [attr.y1]="g.top"
+        [attr.y2]="g.bottom"
+      />
+      @for (row of tip.rows; track row.key) {
+        <circle
+          class="chart__dot"
+          [attr.cx]="tip.x"
+          [attr.cy]="row.y"
+          r="4.5"
+          [style.fill]="row.color"
+        />
+      }
+    } @else {
+      @for (path of g.paths; track path.key) {
+        <circle
+          class="chart__dot"
+          [attr.cx]="path.endX"
+          [attr.cy]="path.endY"
+          r="4.5"
+          [style.fill]="path.color"
+        />
+      }
+    }
+
+    <rect
+      class="chart__hit"
+      [attr.x]="g.left"
+      [attr.y]="g.top"
+      [attr.width]="g.right - g.left"
+      [attr.height]="g.bottom - g.top"
+      tabindex="0"
+      [attr.aria-label]="'Parcourir ' + label() + ' avec les flèches'"
+      (pointermove)="onPointerMove($event)"
+      (pointerleave)="hover.set(null)"
+      (focus)="onFocus()"
+      (blur)="hover.set(null)"
+      (keydown)="onKeydown($event)"
+    />
+  </svg>
+
+  @if (tooltip(); as tip) {
+    <div
+      class="chart-tooltip"
+      [class.chart-tooltip--flip]="tip.flip"
+      [style.left.px]="tip.x"
+      [style.top.px]="g.top"
+    >
+      <p class="chart-tooltip__title">{{ tip.title }}</p>
+      @for (row of tip.rows; track row.key) {
+        <p class="chart-tooltip__row">
+          <span class="chart-tooltip__key" [style.background]="row.color"></span>
+          <strong>{{ row.value }}</strong>
+          <span>{{ row.label }}</span>
+        </p>
+      }
+    </div>
+  }
+</div>

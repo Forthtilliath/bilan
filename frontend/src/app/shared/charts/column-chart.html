@@ -1,0 +1,93 @@
+@let g = geometry();
+<div class="chart__frame" [style.height.px]="height()">
+  <svg
+    class="chart__svg"
+    [attr.width]="g.width"
+    [attr.height]="height()"
+    [attr.viewBox]="'0 0 ' + g.width + ' ' + height()"
+    role="img"
+    [attr.aria-label]="label()"
+  >
+    @for (group of g.groups; track group.key) {
+      @if (group.key === selected() || group.index === hover()) {
+        <rect
+          class="chart__band"
+          [class.chart__band--selected]="group.key === selected()"
+          [attr.x]="group.bandX + 2"
+          [attr.y]="g.top - 6"
+          [attr.width]="g.band - 4"
+          [attr.height]="g.bottom - g.top + 6"
+          rx="6"
+        />
+      }
+    }
+    <g class="chart__grid">
+      @for (tick of g.yTicks; track tick.value) {
+        <line [attr.x1]="g.left" [attr.x2]="g.right" [attr.y1]="tick.y" [attr.y2]="tick.y" />
+        <text
+          class="chart__axis"
+          [attr.x]="g.left - 10"
+          [attr.y]="tick.y"
+          dy="0.32em"
+          text-anchor="end"
+        >
+          {{ tick.label }}
+        </text>
+      }
+    </g>
+    @for (group of g.groups; track group.key) {
+      @for (bar of group.bars; track bar.key) {
+        <path class="chart__bar" [attr.d]="bar.d" [style.fill]="bar.color" />
+      }
+      @if (g.visibleLabels.has(group.index)) {
+        <text
+          class="chart__axis"
+          [class.chart__axis--strong]="group.key === selected()"
+          [attr.x]="group.center"
+          [attr.y]="height() - 8"
+          text-anchor="middle"
+        >
+          {{ labels()[group.index] }}
+        </text>
+      }
+    }
+    <g>
+      @for (group of g.groups; track group.key) {
+        <rect
+          class="chart__hit chart__hit--column"
+          [attr.x]="group.bandX"
+          [attr.y]="g.top"
+          [attr.width]="g.band"
+          [attr.height]="g.bottom - g.top"
+          tabindex="0"
+          role="button"
+          [attr.aria-label]="(titles() ?? labels())[group.index]"
+          (pointerenter)="hover.set(group.index)"
+          (pointerleave)="hover.set(null)"
+          (focus)="hover.set(group.index)"
+          (blur)="hover.set(null)"
+          (click)="picked.emit(group.key)"
+          (keydown)="onKeydown($event, group.index)"
+        />
+      }
+    </g>
+  </svg>
+
+  @if (tooltip(); as tip) {
+    <div
+      class="chart-tooltip"
+      [class.chart-tooltip--flip]="tip.flip"
+      [style.left.px]="tip.x"
+      [style.top.px]="g.top"
+    >
+      <p class="chart-tooltip__title">{{ tip.title }}</p>
+      @for (row of tip.rows; track row.key) {
+        <p class="chart-tooltip__row">
+          <span class="chart-tooltip__key" [style.background]="row.color"></span>
+          <strong>{{ row.value }}</strong>
+          <span>{{ row.label }}</span>
+        </p>
+      }
+    </div>
+  }
+</div>
