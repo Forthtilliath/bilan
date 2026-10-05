@@ -1,0 +1,120 @@
+/* Jetons du design system « Bilan ».
+   Palette categorielle et statuts : instance de reference validee (daltonisme, contraste) pour les deux modes.
+   Le sombre n'est pas une inversion : chaque teinte a son pas choisi pour la surface sombre. */
+
+:root {
+  color-scheme: light;
+
+  /* Surfaces */
+  --page: #f2f1ec;
+  --surface: #fcfcfb;
+  --surface-2: #f4f3ef;
+  --surface-3: #ebeae4;
+  --border: rgb(11 11 11 / 0.09);
+  --border-strong: rgb(11 11 11 / 0.18);
+
+  /* Encres */
+  --ink: #0b0b0b;
+  --ink-2: #52514e;
+  --ink-3: #898781;
+  --on-ink: #fcfcfb;
+
+  /* Graphiques : grille et axes en filets recessifs */
+  --grid: #e1e0d9;
+  --axis: #c3c2b7;
+
+  /* Palette categorielle (ordre fixe : la couleur suit l'entite) */
+  --series-1: #2a78d6;
+  --series-2: #eb6834;
+  --series-3: #1baf7a;
+  --series-4: #eda100;
+  --series-5: #e87ba4;
+  --series-6: #008300;
+  --series-7: #4a3aa7;
+  --series-8: #e34948;
+
+  /* Statuts (reserves, toujours accompagnes d'une icone et d'un libelle) */
+  --good: #0ca30c;
+  --warning: #fab219;
+  --serious: #ec835a;
+  --critical: #d03b3b;
+
+  /* Texte de variation */
+  --up: #006300;
+  --down: #c22f2f;
+
+  --focus: #2a78d6;
+
+  /* Caracteres */
+  --font-sans: 'Geist', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'Geist Mono', ui-monospace, 'Cascadia Mono', monospace;
+  --font-display: 'Instrument Serif', 'Iowan Old Style', Georgia, serif;
+
+  --radius: 14px;
+  --radius-sm: 8px;
+  --shadow: 0 1px 2px rgb(11 11 11 / 0.04), 0 4px 16px -8px rgb(11 11 11 / 0.08);
+  --shadow-lg: 0 24px 64px -24px rgb(11 11 11 / 0.35);
+  --gutter: clamp(16px, 3vw, 36px);
+  --sidebar: 248px;
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:where(:not([data-theme='light'])) {
+    color-scheme: dark;
+    --page: #0d0d0d;
+    --surface: #1a1a19;
+    --surface-2: #222220;
+    --surface-3: #2c2c2a;
+    --border: rgb(255 255 255 / 0.08);
+    --border-strong: rgb(255 255 255 / 0.16);
+    --ink: #ffffff;
+    --ink-2: #c3c2b7;
+    --ink-3: #898781;
+    --on-ink: #0d0d0d;
+    --grid: #2c2c2a;
+    --axis: #383835;
+    --series-1: #3987e5;
+    --series-2: #d95926;
+    --series-3: #199e70;
+    --series-4: #c98500;
+    --series-5: #d55181;
+    --series-6: #008300;
+    --series-7: #9085e9;
+    --series-8: #e66767;
+    --up: #0ca30c;
+    --down: #e66767;
+    --focus: #3987e5;
+    --shadow: 0 1px 2px rgb(0 0 0 / 0.3);
+    --shadow-lg: 0 24px 64px -24px rgb(0 0 0 / 0.8);
+  }
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --page: #0d0d0d;
+  --surface: #1a1a19;
+  --surface-2: #222220;
+  --surface-3: #2c2c2a;
+  --border: rgb(255 255 255 / 0.08);
+  --border-strong: rgb(255 255 255 / 0.16);
+  --ink: #ffffff;
+  --ink-2: #c3c2b7;
+  --ink-3: #898781;
+  --on-ink: #0d0d0d;
+  --grid: #2c2c2a;
+  --axis: #383835;
+  --series-1: #3987e5;
+  --series-2: #d95926;
+  --series-3: #199e70;
+  --series-4: #c98500;
+  --series-5: #d55181;
+  --series-6: #008300;
+  --series-7: #9085e9;
+  --series-8: #e66767;
+  --up: #0ca30c;
+  --down: #e66767;
+  --focus: #3987e5;
+  --shadow: 0 1px 2px rgb(0 0 0 / 0.3);
+  --shadow-lg: 0 24px 64px -24px rgb(0 0 0 / 0.8);
+}
