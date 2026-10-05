@@ -117,6 +117,38 @@ Quelques choix :
 | GET / POST / DELETE   | `/api/trades[/{id}]`                   | Ordres (422 si survente ou liquidités insuffisantes) |
 | POST                  | `/api/demo/reset`                      | Régénère les données de démonstration           |
 
+## Qualité et sécurité
+
+Une commande rejoue toute la CI en local (Docker requis), avec un récapitulatif final :
+
+```bash
+npm run verify         # tout : lint, types, tests, couverture, scans, pile Docker, E2E
+npm run verify:quick   # sans Docker : lint, types, tests unitaires, build, audit npm
+```
+
+| Domaine | Outils | Seuil bloquant |
+| --- | --- | --- |
+| **Tests backend** | JUnit 5, AssertJ, **Testcontainers** (vrai PostgreSQL), ArchUnit | 55 tests ; couverture JaCoCo ≥ 95 % des lignes, ≥ 80 % des branches |
+| **Tests frontend** | Vitest + TestBed (composants, formulaires, pages, `HttpTestingController`) | 59 tests ; couverture ≥ 85 % des lignes |
+| **E2E** | Playwright contre la pile Docker (bureau + mobile) | 37 parcours, zéro erreur JS ou violation CSP |
+| **Accessibilité** | axe-core sur les 5 pages, thèmes clair et sombre | zéro violation WCAG 2.1 AA sérieuse |
+| **Lint** | `javac -Xlint -Werror`, PMD, ESLint (config partagée stricte), Stylelint, Prettier | zéro avertissement |
+| **Types** | `strictTemplates` Angular, `tsc --noEmit` (app, tests unitaires, tests E2E) | zéro erreur |
+| **Dépendances** | `npm audit` avec liste d'exceptions datée, Trivy (POM, `package-lock`), Dependabot | aucune vulnérabilité haute non justifiée |
+| **Secrets** | Gitleaks sur tout l'historique, Trivy | aucun secret |
+| **Conteneurs** | Trivy (images et Dockerfiles) ; JRE et nginx **non root** | aucune vulnérabilité haute corrigeable |
+| **Code** | CodeQL (Java et TypeScript, requêtes `security-and-quality`) | analyse à chaque PR |
+
+Mesures de sécurité de l'application :
+
+- **En-têtes HTTP** (nginx) : CSP stricte (`script-src 'self'`, aucun script inline, `frame-ancestors 'none'`),
+  `X-Content-Type-Options`, `Referrer-Policy`, `Permissions-Policy`, `Cross-Origin-Opener-Policy`, version du serveur
+  masquée, corps de requête limité à 64 ko, sondes `/actuator` non exposées.
+- **API** : validation de chaque entrée (Bean Validation + règles métier), montants normalisés au centime, recherche
+  bornée, requêtes paramétrées (JPA Criteria), erreurs ProblemDetail sans trace technique, remise à zéro de la démo
+  limitée (429 + `Retry-After`).
+- **Front** : aucun `innerHTML`, texte saisi toujours échappé (testé en E2E avec une charge XSS).
+
 ## Développement local
 
 Prérequis : Node.js 22+, Java 21+, Docker (pour PostgreSQL). Maven n'est pas requis (wrapper inclus).
@@ -126,11 +158,13 @@ npm install && npm --prefix frontend install
 npm run dev        # PostgreSQL (docker, port 5436) + Spring Boot (:8082) + ng serve (:4200, proxy /api)
 ```
 
-| Commande                           | Effet                                                       |
-| ---------------------------------- | ----------------------------------------------------------- |
-| `cd backend && ./mvnw test`        | Tests JUnit (positions, chronologie, flux, données de démo) |
-| `npm --prefix frontend test`       | Tests Vitest (échelles, formats, périodes)                  |
-| `npm --prefix frontend run lint`   | ESLint                                                      |
+| Commande                                 | Effet                                                   |
+| ---------------------------------------- | ------------------------------------------------------- |
+| `cd backend && ./mvnw verify`            | Compilation stricte, PMD, tests (Testcontainers), JaCoCo |
+| `npm --prefix frontend run test:coverage` | Tests Vitest avec seuils de couverture                  |
+| `npm --prefix frontend run lint`         | ESLint (et `lint:css` pour Stylelint)                    |
+| `npm run test:e2e`                       | Playwright contre la pile Docker (`npm run demo` avant)  |
+| `npm run audit`                          | Audit npm avec la liste d'exceptions `security/`         |
 
 ## Code partagé
 
