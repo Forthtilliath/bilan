@@ -21,5 +21,6 @@ public record AccountRequest(
 		@NotNull(message = "La date d'ouverture est obligatoire.")
 		@PastOrPresent(message = "La date d'ouverture ne peut pas être dans le futur.") LocalDate openedOn,
 		@Min(1) @Max(8) int color,
-		boolean archived) {
+		// Facultatif : absent = compte actif.
+		Boolean archived) {
 }
