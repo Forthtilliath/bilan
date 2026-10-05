@@ -36,8 +36,9 @@ public class ApiExceptionHandler {
 				.body(ProblemDetail.forStatusAndDetail(HttpStatus.TOO_MANY_REQUESTS, ex.getMessage()));
 	}
 
+	/** Le detail de l'erreur de parsing n'est pas renvoye : il pourrait exposer la structure interne. */
 	@ExceptionHandler(HttpMessageNotReadableException.class)
-	public ProblemDetail unreadableBody(HttpMessageNotReadableException ex) {
+	public ProblemDetail unreadableBody() {
 		return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, "Corps JSON illisible ou mal formé.");
 	}
 

@@ -81,7 +81,8 @@ public class TradeService {
 		if (asset == null) {
 			errors.put("assetId", "Titre introuvable.");
 		}
-		if (!errors.isEmpty()) {
+		// Invariant explicite : compte et titre sont valides des qu'aucune erreur n'a ete relevee.
+		if (!errors.isEmpty() || account == null || asset == null) {
 			throw new FieldErrorsException("Ordre invalide.", errors);
 		}
 		Trade trade = new Trade(account.getId(), asset.getId(), request.side(), request.tradedOn(),
