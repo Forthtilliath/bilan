@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ruleset name="bilan"
+		xmlns="http://pmd.sourceforge.net/ruleset/2.0.0"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0 https://pmd.sourceforge.io/ruleset_2_0_0.xsd">
+
+	<description>
+		Analyse statique du backend : erreurs probables, mauvaises pratiques, securite et performance.
+		Les regles de pur style (nommage, longueur des lignes) sont laissees au formatage de l'IDE.
+	</description>
+
+	<rule ref="category/java/errorprone.xml">
+		<!-- Les messages et libelles en francais repetent volontairement des litteraux courts. -->
+		<exclude name="AvoidDuplicateLiterals" />
+		<!-- Entites JPA : champs initialises par le constructeur ou par Hibernate. -->
+		<exclude name="AvoidFieldNameMatchingMethodName" />
+		<exclude name="NullAssignment" />
+		<!-- Tests AssertJ : les assertions sont fluides, pas des assertXxx(). -->
+		<exclude name="DetachedTestCase" />
+		<!-- Le scenario de demo s'ecrit en mois et jours explicites (mois 20, jour 28...). -->
+		<exclude name="AvoidLiteralsInIfCondition" />
+	</rule>
+
+	<rule ref="category/java/bestpractices.xml">
+		<exclude name="GuardLogStatement" />
+		<!-- AssertJ : assertThat(...).isXxx() n'est pas reconnu comme assertion par PMD. -->
+		<exclude name="UnitTestShouldIncludeAssert" />
+		<exclude name="UnitTestContainsTooManyAsserts" />
+		<exclude name="UnitTestAssertionsShouldIncludeMessage" />
+		<!-- Les tableaux de lignes JDBC sont lus par position, de facon controlee. -->
+		<exclude name="LooseCoupling" />
+	</rule>
+
+	<rule ref="category/java/security.xml" />
+	<rule ref="category/java/multithreading.xml">
+		<!-- Spring gere le cycle de vie des beans ; pas de champs partages mutables. -->
+		<exclude name="UseConcurrentHashMap" />
+		<exclude name="DoNotUseThreads" />
+	</rule>
+	<rule ref="category/java/performance.xml">
+		<exclude name="AvoidInstantiatingObjectsInLoops" />
+		<exclude name="TooFewBranchesForSwitch" />
+	</rule>
+
+	<rule ref="category/java/design.xml/SimplifyBooleanReturns" />
+	<rule ref="category/java/design.xml/SingularField" />
+	<rule ref="category/java/design.xml/ImmutableField" />
+	<rule ref="category/java/design.xml/UselessOverridingMethod" />
+	<rule ref="category/java/design.xml/CognitiveComplexity">
+		<properties>
+			<property name="reportLevel" value="25" />
+		</properties>
+	</rule>
+	<rule ref="category/java/codestyle.xml/UnnecessaryImport" />
+	<rule ref="category/java/codestyle.xml/UnnecessaryFullyQualifiedName" />
+	<rule ref="category/java/codestyle.xml/UselessParentheses" />
+</ruleset>
