@@ -1,0 +1,11 @@
+{
+  "$comment": "Avis npm acceptes temporairement. Chaque entree est justifiee, et rejetee par scripts/audit.mjs une fois expiree : on reverifie alors si un correctif existe.",
+  "advisories": [
+    {
+      "id": "GHSA-vfj7-8cjw-p6xm",
+      "package": "braces",
+      "reason": "Outil de developpement uniquement (stylelint -> globby/fast-glob -> micromatch). Les motifs glob sont ceux du depot, jamais une saisie utilisateur ; aucune version corrigee publiee (<= 3.0.3 toutes concernees).",
+      "expires": "2027-01-05"
+    }
+  ]
+}
