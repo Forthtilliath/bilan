@@ -1,0 +1,106 @@
+<form class="form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+  @if (problem(); as message) {
+    <p class="alert" role="alert"><app-icon name="alert" /> {{ message }}</p>
+  }
+
+  @if (!kindLocked()) {
+    <app-segmented label="Sens" [options]="kinds" [(value)]="kind" />
+  } @else {
+    <p class="field__hint">
+      {{ kind() === 'EXPENSE' ? 'Catégorie de dépense' : 'Catégorie de revenu' }} — déjà utilisée,
+      son sens ne peut plus changer.
+    </p>
+  }
+  @if (errors()['kind']; as error) {
+    <span class="field__error">{{ error }}</span>
+  }
+
+  <label class="field">
+    <span class="field__label">Nom</span>
+    <input
+      class="input"
+      formControlName="name"
+      maxlength="60"
+      autocomplete="off"
+      [attr.aria-invalid]="!!errors()['name']"
+    />
+    @if (errors()['name']; as error) {
+      <span class="field__error">{{ error }}</span>
+    }
+  </label>
+
+  @if (kind() === 'EXPENSE') {
+    <label class="field">
+      <span class="field__label">Budget mensuel (€)</span>
+      <input
+        class="input num"
+        type="number"
+        min="1"
+        step="1"
+        formControlName="monthlyBudget"
+        placeholder="Aucun"
+        [attr.aria-invalid]="!!errors()['monthlyBudget']"
+      />
+      <span class="field__hint">Laissez vide pour ne pas suivre de budget.</span>
+      @if (errors()['monthlyBudget']; as error) {
+        <span class="field__error">{{ error }}</span>
+      }
+    </label>
+  }
+
+  <div class="field">
+    <span class="field__label" id="category-color">Couleur</span>
+    <div class="picker" role="radiogroup" aria-labelledby="category-color">
+      @for (slot of slots; track slot) {
+        <button
+          type="button"
+          class="picker__option"
+          role="radio"
+          [attr.aria-checked]="form.controls.color.value === slot"
+          [attr.aria-label]="'Couleur ' + slot"
+          (click)="form.controls.color.setValue(slot)"
+        >
+          <span class="picker__swatch" [style.--swatch]="seriesColor(slot)"></span>
+        </button>
+      }
+    </div>
+  </div>
+
+  <div class="field">
+    <span class="field__label" id="category-icon">Icône</span>
+    <div class="picker" role="radiogroup" aria-labelledby="category-icon">
+      @for (icon of icons; track icon) {
+        <button
+          type="button"
+          class="picker__option"
+          role="radio"
+          [attr.aria-checked]="form.controls.icon.value === icon"
+          [attr.aria-label]="icon"
+          (click)="form.controls.icon.setValue(icon)"
+        >
+          <app-icon [name]="icon" />
+        </button>
+      }
+    </div>
+  </div>
+
+  <div class="form__actions">
+    @if (category(); as existing) {
+      <app-confirm-button
+        [disabled]="saving()"
+        [confirmLabel]="
+          existing.transactionCount
+            ? 'Supprimer (' + existing.transactionCount + ' op. décatégorisées)'
+            : 'Confirmer la suppression'
+        "
+        (confirmed)="remove()"
+      />
+    }
+    <div class="form__actions-end">
+      <button type="button" class="btn btn--ghost" (click)="cancelled.emit()">Annuler</button>
+      <button type="submit" class="btn btn--primary" [disabled]="saving()">
+        {{ category() ? 'Enregistrer' : 'Créer la catégorie' }}
+      </button>
+    </div>
+  </div>
+</form>
