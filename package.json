@@ -14,7 +14,7 @@
     "audit": "node scripts/audit.mjs"
   },
   "devDependencies": {
-    "@axe-core/playwright": "^4.13.0",
+    "@axe-core/playwright": "^4.14.0",
     "@playwright/test": "^1.63.0",
     "@types/node": "^24.19.1",
     "concurrently": "^9.2.4",
