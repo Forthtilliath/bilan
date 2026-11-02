@@ -21,7 +21,7 @@
 		<jackson-bom.version>3.1.7</jackson-bom.version>
 		<archunit.version>1.5.1</archunit.version>
 		<pmd-plugin.version>3.28.0</pmd-plugin.version>
-		<jacoco-plugin.version>0.8.15</jacoco-plugin.version>
+		<jacoco-plugin.version>0.8.16</jacoco-plugin.version>
 		<coverage.lines>0.95</coverage.lines>
 		<coverage.branches>0.80</coverage.branches>
 	</properties>
