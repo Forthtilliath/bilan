@@ -6,6 +6,12 @@
       "package": "braces",
       "reason": "Outil de developpement uniquement (stylelint -> globby/fast-glob -> micromatch). Les motifs glob sont ceux du depot, jamais une saisie utilisateur ; aucune version corrigee publiee (<= 3.0.3 toutes concernees).",
       "expires": "2027-01-05"
+    },
+    {
+      "id": "GHSA-g3hv-75wg-m249",
+      "package": "minimatch",
+      "reason": "Outil de developpement uniquement (eslint -> typescript-eslint -> @typescript-eslint/typescript-estree -> minimatch 10). Les motifs glob sont ceux de la config du depot, jamais une saisie utilisateur ; correctif seulement en minimatch 11, que typescript-eslint 8 n'accepte pas encore.",
+      "expires": "2027-01-08"
     }
   ]
 }
