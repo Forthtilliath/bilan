@@ -34,6 +34,9 @@ updates:
     ignore:
       - dependency-name: typescript
         update-types: [version-update:semver-major]
+      # Types alignés sur Node 24 (CI, Docker) : à monter avec le runtime.
+      - dependency-name: '@types/node'
+        update-types: [version-update:semver-major]
     groups:
       root-minor-patch:
         update-types: [minor, patch]
@@ -44,6 +47,14 @@ updates:
     directories: [/backend, /frontend]
     schedule:
       interval: monthly
+    ignore:
+      # Runtimes alignés sur la CI (Node 24, Java 21) : changement de version majeure à faire
+      # partout à la fois (pom, setup-java/setup-node, images), pas image par image.
+      - dependency-name: node
+        update-types: [version-update:semver-major]
+      - dependency-name: eclipse-temurin
+        update-types: [version-update:semver-major]
+      - dependency-name: maven
     groups:
       docker-images:
         patterns: ['*']
