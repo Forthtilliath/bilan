@@ -63,7 +63,28 @@ test.describe('investissements', () => {
     await expect(drawer.locator('.field__error')).toContainText('Position insuffisante');
   });
 
-  test('achète une fraction de bitcoin puis la retrouve dans l’historique', async ({ page }) => {
+  test('achète une fraction de bitcoin puis la retrouve dans l’historique', async ({
+    page,
+    request,
+  }) => {
+    // La démo investit toutes les liquidités crypto le 6 du mois et ne réalimente le portefeuille
+    // qu'après la paie : sans ce virement, l'achat est refusé une bonne partie du mois.
+    const accounts = (await (await request.get('/api/accounts')).json()) as {
+      id: string;
+      name: string;
+    }[];
+    const idOf = (name: string) => accounts.find((a) => a.name === name)?.id;
+    const transfer = await request.post('/api/transfers', {
+      data: {
+        fromAccountId: idOf('Compte courant'),
+        toAccountId: idOf('Portefeuille crypto'),
+        // Date UTC : jamais en avance sur la date de Paris, donc jamais « dans le futur ».
+        bookedOn: new Date().toISOString().slice(0, 10),
+        amount: 50,
+      },
+    });
+    expect(transfer.status()).toBe(201);
+
     await page.goto('/investissements');
     await page.getByRole('button', { name: 'Passer un ordre' }).click();
     const drawer = page.getByRole('dialog');
