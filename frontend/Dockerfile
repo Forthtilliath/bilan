@@ -7,7 +7,7 @@ COPY . .
 RUN npx ng build
 
 # --- Runtime : nginx (utilisateur non root, port 8080) sert le SPA et relaie /api vers Spring Boot
-FROM nginxinc/nginx-unprivileged:1.29-alpine
+FROM nginxinc/nginx-unprivileged:1.31-alpine
 # Paquets systeme a jour (correctifs de securite publies apres l'image de base), puis retour en non-root.
 USER root
 RUN apk upgrade --no-cache
