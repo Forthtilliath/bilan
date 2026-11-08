@@ -1,32 +1,57 @@
 version: 2
+
+# Mensuel et groupé : au plus deux PR par écosystème (correctifs/mineures, puis majeures),
+# plutôt qu'une PR par paquet chaque semaine.
 updates:
   - package-ecosystem: maven
     directory: /backend
     schedule:
-      interval: weekly
+      interval: monthly
     groups:
-      spring:
-        patterns: ['org.springframework*', 'org.testcontainers*']
+      maven-minor-patch:
+        update-types: [minor, patch]
+      maven-major:
+        update-types: [major]
 
   - package-ecosystem: npm
     directory: /frontend
     schedule:
-      interval: weekly
+      interval: monthly
+    ignore:
+      # TypeScript 7 : refusé par typescript-eslint 8 (< 6.1) et par le compilateur Angular 22.
+      - dependency-name: typescript
+        update-types: [version-update:semver-major]
     groups:
-      angular:
-        patterns: ['@angular/*', '@angular-devkit/*']
+      frontend-minor-patch:
+        update-types: [minor, patch]
+      frontend-major:
+        update-types: [major]
 
   - package-ecosystem: npm
     directory: /
     schedule:
-      interval: weekly
+      interval: monthly
+    ignore:
+      - dependency-name: typescript
+        update-types: [version-update:semver-major]
+    groups:
+      root-minor-patch:
+        update-types: [minor, patch]
+      root-major:
+        update-types: [major]
 
   - package-ecosystem: docker
     directories: [/backend, /frontend]
     schedule:
-      interval: weekly
+      interval: monthly
+    groups:
+      docker-images:
+        patterns: ['*']
 
   - package-ecosystem: github-actions
     directory: /
     schedule:
-      interval: weekly
+      interval: monthly
+    groups:
+      github-actions:
+        patterns: ['*']
